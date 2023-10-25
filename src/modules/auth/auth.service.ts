@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcryptjs';
 import { UsersRepository } from 'src/shared/database/repositories/users.repository';
-import { AuthenticateDto } from './dto/authenticate.dto';
+import { SigninDto } from './dto/signin.dto';
 import { SignupDto } from './dto/signup.dto';
 
 @Injectable()
@@ -63,8 +63,8 @@ export class AuthService {
     return { accessToken };
   }
 
-  async authenticate(authenticateDto: AuthenticateDto) {
-    const { email, password } = authenticateDto;
+  async signin(signinDto: SigninDto) {
+    const { email, password } = signinDto;
 
     const user = await this.usersRepository.findUnique({ where: { email } });
 
