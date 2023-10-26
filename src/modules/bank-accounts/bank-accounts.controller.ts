@@ -1,17 +1,15 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
-  Param,
-  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
 import { ActiveUserId } from 'src/shared/decorators/ActiveUserId';
+import { UUIDParam } from 'src/shared/decorators/UUIDParam';
 import { BankAccountsService } from './bank-accounts.service';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
 import { UpdateBankAccountDto } from './dto/update-bank-account.dto';
@@ -36,14 +34,7 @@ export class BankAccountsController {
   @Put(':bankAccountId')
   update(
     @ActiveUserId() userId: string,
-    @Param(
-      'bankAccountId',
-      new ParseUUIDPipe({
-        exceptionFactory: () =>
-          new BadRequestException('Path parameter should be a UUID'),
-      }),
-    )
-    bankAccountId: string,
+    @UUIDParam('bankAccountId') bankAccountId: string,
     @Body() updateBankAccountDto: UpdateBankAccountDto,
   ) {
     return this.bankAccountsService.update(
@@ -57,14 +48,7 @@ export class BankAccountsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(
     @ActiveUserId() userId: string,
-    @Param(
-      'bankAccountId',
-      new ParseUUIDPipe({
-        exceptionFactory: () =>
-          new BadRequestException('Path parameter should be a UUID'),
-      }),
-    )
-    bankAccountId: string,
+    @UUIDParam('bankAccountId') bankAccountId: string,
   ) {
     return this.bankAccountsService.remove(userId, bankAccountId);
   }
