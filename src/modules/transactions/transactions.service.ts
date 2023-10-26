@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TransactionsRepository } from 'src/shared/database/repositories/transactions.repository';
 import { BankAccountOwnershipValidationService } from '../bank-accounts/services/bank-account-ownership-validation.service';
 import { CategoryOwnershipValidationService } from '../categories/services/category-ownership-validation.service';
@@ -36,29 +36,71 @@ export class TransactionsService {
     return this.transactionsRepository.findMany({ where: { userId } });
   }
 
-  update(id: string, updateTransactionDto: UpdateTransactionDto) {
-    return updateTransactionDto;
+  async update(
+    userId: string,
+    transactionId: string,
+    updateTransactionDto: UpdateTransactionDto,
+  ) {
+    const { bankAccountId, categoryId, name, value, type, date } =
+      updateTransactionDto;
+
+    await this.validateEntitiesOwnership({
+      userId,
+      bankAccountId,
+      categoryId,
+      transactionId,
+    });
+
+    return this.transactionsRepository.update({
+      where: { id: transactionId },
+      data: {
+        bankAccountId,
+        categoryId,
+        name,
+        value,
+        type,
+        date,
+      },
+    });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} transaction`;
+  async remove(userId: string, transactionId: string) {
+    await this.validateTransactionOwnership(userId, transactionId);
+
+    await this.transactionsRepository.delete({ where: { id: transactionId } });
   }
 
   private async validateEntitiesOwnership({
     userId,
     categoryId,
     bankAccountId,
+    transactionId,
   }: {
     userId: string;
     categoryId: string;
     bankAccountId: string;
+    transactionId?: string;
   }) {
     await Promise.all([
+      transactionId && this.validateTransactionOwnership(userId, transactionId),
       this.bankAccountOwnershipValidationService.validate(
         userId,
         bankAccountId,
       ),
       this.categoryOwnershipValidationService.validate(userId, categoryId),
     ]);
+  }
+
+  private async validateTransactionOwnership(
+    userId: string,
+    transactionId: string,
+  ) {
+    const transaction = await this.transactionsRepository.findFirst({
+      where: { id: transactionId, userId },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found.');
+    }
   }
 }
