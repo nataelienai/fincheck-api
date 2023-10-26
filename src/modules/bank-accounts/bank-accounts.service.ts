@@ -1,12 +1,26 @@
 import { Injectable } from '@nestjs/common';
+import { BankAccountsRepository } from 'src/shared/database/repositories/bank-accounts.repository';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
 import { UpdateBankAccountDto } from './dto/update-bank-account.dto';
 
 @Injectable()
 export class BankAccountsService {
-  create(createBankAccountDto: CreateBankAccountDto) {
-    console.log(createBankAccountDto);
-    return 'This action adds a new bankAccount';
+  constructor(
+    private readonly bankAccountsRepository: BankAccountsRepository,
+  ) {}
+
+  create(userId: string, createBankAccountDto: CreateBankAccountDto) {
+    const { name, initialBalance, type, color } = createBankAccountDto;
+
+    return this.bankAccountsRepository.create({
+      data: {
+        userId,
+        name,
+        initialBalance,
+        type,
+        color,
+      },
+    });
   }
 
   findAll() {
