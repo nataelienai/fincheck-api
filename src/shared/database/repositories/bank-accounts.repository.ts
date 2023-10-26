@@ -9,4 +9,8 @@ export class BankAccountsRepository {
   create(createDto: Prisma.BankAccountCreateArgs) {
     return this.prismaService.bankAccount.create(createDto);
   }
+
+  findMany(findManyDto: Prisma.BankAccountFindManyArgs) {
+    return this.prismaService.bankAccount.findMany(findManyDto);
+  }
 }
