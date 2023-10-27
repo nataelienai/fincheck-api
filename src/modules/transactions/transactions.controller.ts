@@ -1,17 +1,23 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
+  ParseEnumPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ActiveUserId } from 'src/shared/decorators/ActiveUserId';
+import { IntQuery } from 'src/shared/decorators/IntQuery';
 import { UUIDParam } from 'src/shared/decorators/UUIDParam';
+import { UUIDQuery } from 'src/shared/decorators/UUIDQuery';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { TransactionType } from './entities/transaction.entity';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
@@ -27,8 +33,33 @@ export class TransactionsController {
   }
 
   @Get()
-  findAll(@ActiveUserId() userId: string) {
-    return this.transactionsService.findAllByUserId(userId);
+  findAll(
+    @ActiveUserId() userId: string,
+    @IntQuery('month') month: number,
+    @IntQuery('year') year: number,
+    @UUIDQuery('bankAccountId', { optional: true }) bankAccountId?: string,
+    @UUIDQuery('categoryId', { optional: true }) categoryId?: string,
+    @Query(
+      'type',
+      new ParseEnumPipe(TransactionType, {
+        optional: true,
+        exceptionFactory: () =>
+          new BadRequestException(
+            `type should be one of the following values: ${Object.values(
+              TransactionType,
+            ).join(', ')}.`,
+          ),
+      }),
+    )
+    type?: TransactionType,
+  ) {
+    return this.transactionsService.findAllByUserId(userId, {
+      year,
+      month,
+      bankAccountId,
+      categoryId,
+      type,
+    });
   }
 
   @Put(':transactionId')
