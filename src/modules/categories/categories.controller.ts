@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ActiveUserId } from 'src/shared/decorators/ActiveUserId';
+import { ActiveUserId } from 'src/shared/decorators/active-user-id.decorator';
 import { CategoriesService } from './services/categories.service';
 
 @Controller('categories')

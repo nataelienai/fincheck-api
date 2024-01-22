@@ -11,10 +11,10 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ActiveUserId } from 'src/shared/decorators/ActiveUserId';
-import { IntQuery } from 'src/shared/decorators/IntQuery';
-import { UUIDParam } from 'src/shared/decorators/UUIDParam';
-import { UUIDQuery } from 'src/shared/decorators/UUIDQuery';
+import { ActiveUserId } from 'src/shared/decorators/active-user-id.decorator';
+import { IntQuery } from 'src/shared/decorators/int-query.decorator';
+import { UUIDParam } from 'src/shared/decorators/uuid-param.decorator';
+import { UUIDQuery } from 'src/shared/decorators/uuid-query.decorator';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionType } from './entities/transaction.entity';
