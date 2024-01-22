@@ -1,73 +1,228 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Fincheck API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Esta é a API que permite o funcionamento do Web App [Fincheck](https://github.com/nataelienai/fincheck-web).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tecnologias
 
-## Description
+- Linguagem: TypeScript (Node.js)
+- Gerenciador de pacotes: npm
+- Bibliotecas: NestJS, Prisma, bcrypt.js e dotenv
+- Banco de dados: PostgreSQL
+- Ferramentas: ESLint, Prettier, EditorConfig, commitlint, husky, lint-staged, Git e Docker
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Dependências
 
-## Installation
+Para executar a API em seu computador, você precisará de [Git](https://git-scm.com/downloads), [Node.js](https://nodejs.org/) e [Docker](https://docs.docker.com/engine/install/) instalados.
 
-```bash
-$ npm install
+## Como executar
+
+1. Usando um terminal, clone o repositório:
+```sh
+git clone https://github.com/nataelienai/fincheck-api.git
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+2. Entre na pasta do repositório clonado:
+```sh
+cd fincheck-api
 ```
 
-## Test
+3. Inicialize o banco de dados:
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+- Na primeira vez, execute o comando:
+```sh
+docker run --name fincheck-db -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
 ```
 
-## Support
+- Nas outras vezes, basta executar o comando:
+```sh
+docker start fincheck-db
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+4. Renomeie o arquivo `.env.example` para `.env` e troque o valor da variável `JWT_SECRET`:
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/fincheck?schema=public"
+JWT_SECRET=<insira uma chave secreta qualquer aqui>
+```
 
-## Stay in touch
+5. Instale as dependências do projeto:
+```sh
+npm install
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+6. Execute as migrations do Prisma:
+```sh
+npx prisma migrate dev
+```
 
-## License
+7. Inicialize a aplicação:
+```sh
+npm start
+```
 
-Nest is [MIT licensed](LICENSE).
+## Rotas
+
+### Autenticação
+
+- **POST /auth/signup**: Cria uma conta de usuário.
+- **POST /auth/signin**: Realiza login numa conta de usuário.
+
+### Usuários
+
+- **GET /users/me**: Lista as informações do usuário logado.
+
+### Categorias
+
+- **GET /categories**: Lista todas as categorias do usuário logado.
+
+### Contas bancárias
+
+- **GET /bank-accounts**: Lista todas as contas bancárias do usuário logado.
+- **POST /bank-accounts**: Registra uma conta bancária do usuário logado.
+- **PUT /bank-accounts/:bankAccountId**: Atualiza uma conta bancária do usuário logado.
+- **DELETE /bank-accounts/:bankAccountId**: Exclui uma conta bancária do usuário logado.
+
+### Transações
+
+- **GET /transactions**: Lista todas as transações do usuário logado.
+  - Query filters:
+    - year (obrigatório): ano em que ocorreram as transações
+    - month (obrigatório): mês em que ocorreram as transações (0-11)
+    - bankAccountId: id da conta bancária das transações
+    - categoryId: id da categoria das transações
+    - type: tipo das transações (EXPENSE ou INCOME)
+- **POST /transactions**: Registra uma transação do usuário logado.
+- **PUT /transactions/:transactionId**: Atualiza uma transação do usuário logado.
+- **DELETE /transactions/:transactionId**: Exclui uma transação do usuário logado.
+
+## Exemplos
+
+Aqui estão exemplos de uso de cada rota da API:
+
+### Autenticação
+
+- **Criar uma conta de usuário**:
+```http
+POST /auth/signup
+Content-Type: application/json
+
+{
+  "name": "Natã",
+  "email": "nata@email.com",
+  "password": "12345678"
+}
+```
+
+- **Realizar login numa conta de usuário**:
+```http
+POST /auth/signin
+Content-Type: application/json
+
+{
+  "email": "nata@email.com",
+  "password": "12345678"
+}
+```
+
+### Usuários
+
+- **Listar as informações do usuário logado**:
+```http
+GET /users/me
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+```
+
+### Categorias
+
+- **Listar todas as categorias do usuário logado**:
+```http
+GET /categories
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+```
+
+### Contas bancárias
+
+- **Listar todas as contas bancárias do usuário logado**:
+```http
+GET /bank-accounts
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+```
+
+- **Registrar uma conta bancária do usuário logado**:
+```http
+POST /bank-accounts
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+Content-Type: application/json
+
+{
+  "name": "Caixa Econômica",
+  "initialBalance": 2000,
+  "color": "#0000AA",
+  "type": "CASH"
+}
+```
+
+- **Atualizar uma conta bancária do usuário logado**:
+```http
+PUT /bank-accounts/55570f86-2fd0-41c7-a934-9e3adf9b967e
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+Content-Type: application/json
+
+{
+  "name": "Caixa",
+  "initialBalance": 2000,
+  "color": "#0000AA",
+  "type": "CASH"
+}
+```
+
+- **Excluir uma conta bancária do usuário logado**:
+```http
+DELETE /bank-accounts/55570f86-2fd0-41c7-a934-9e3adf9b967e
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+```
+
+### Transações
+
+- **Listar todas as transações do usuário logado**:
+```http
+GET /transactions?year=2024&month=0
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+```
+
+- **Registrar uma transação do usuário logado**:
+```http
+POST /transactions
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+Content-Type: application/json
+
+{
+  "bankAccountId": "28619ec8-1c18-45eb-bb39-3db419e4d57f",
+  "categoryId": "7b8a6d44-f9bf-4a4e-8b11-3abf9b980f18",
+  "name": "Salário",
+  "value": 1000,
+  "date": "2024-01-22T19:45:00.000Z",
+  "type": "INCOME"
+}
+```
+
+- **Atualizar uma transação do usuário logado**:
+```http
+PUT /transactions/f9123ab6-1326-4cc6-8c1d-e44eb616ca0e
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+Content-Type: application/json
+
+{
+  "bankAccountId": "28619ec8-1c18-45eb-bb39-3db419e4d57f",
+  "categoryId": "7b8a6d44-f9bf-4a4e-8b11-3abf9b980f18",
+  "name": "Salário",
+  "value": 2000,
+  "date": "2024-01-22T19:45:00.000Z",
+  "type": "INCOME"
+}
+```
+
+- **Excluir uma transação do usuário logado**:
+```http
+DELETE /transactions/f9123ab6-1326-4cc6-8c1d-e44eb616ca0e
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYWRjZDUzNC1mOGRlLTRiMDYtYmY4ZC1lMmE4ZmQwNWVlMTAiLCJpYXQiOjE3MDU5NTIxODMsImV4cCI6MTcwNjU1Njk4M30.B_F8qt2s3KKJ6vWe32IUXqxcwRDeOneTrS_NViNHgwE
+```
