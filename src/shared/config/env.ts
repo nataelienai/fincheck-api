@@ -24,7 +24,7 @@ class Env {
 export const env = plainToInstance(Env, {
   jwtSecret: process.env.JWT_SECRET,
   frontendUrl: process.env.FRONTEND_URL,
-  port: process.env.PORT || 3000,
+  port: Number(process.env.PORT) || 3000,
 });
 
 const errors = validateSync(env);
