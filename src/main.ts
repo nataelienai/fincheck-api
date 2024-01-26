@@ -12,6 +12,6 @@ async function bootstrap() {
   app.enableShutdownHooks();
   app.enableCors({ origin: env.frontendUrl });
 
-  await app.listen(3000);
+  await app.listen(env.port);
 }
 bootstrap();

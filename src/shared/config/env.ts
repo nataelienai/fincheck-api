@@ -1,5 +1,11 @@
 import { plainToInstance } from 'class-transformer';
-import { IsNotEmpty, IsString, NotEquals, validateSync } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  NotEquals,
+  validateSync,
+} from 'class-validator';
 
 class Env {
   @IsString()
@@ -10,11 +16,15 @@ class Env {
   @IsString()
   @IsNotEmpty()
   frontendUrl: string;
+
+  @IsNumber()
+  port: number;
 }
 
 export const env = plainToInstance(Env, {
   jwtSecret: process.env.JWT_SECRET,
   frontendUrl: process.env.FRONTEND_URL,
+  port: process.env.PORT || 3000,
 });
 
 const errors = validateSync(env);
